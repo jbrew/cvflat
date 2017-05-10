@@ -21,7 +21,7 @@ class Palette(wx.Panel):
 
 		self.active_index = (0,0)
 
-		self.tile_matrix = [[Tile(self, self.tile_size, self.tile_size, 10, bgcolor=(0,0,0)) for x in range(self.tiles_across)] for y in range(self.tiles_tall)]
+		self.tile_matrix = [[Tile(self, self.tile_size, self.tile_size, 10, bgcolor=(0,0,100)) for y in range(self.tiles_tall)] for x in range(self.tiles_across)]
 
 		self.img = self.ArrayToImage(numpy.zeros( (self.width, self.height,  3),'uint8'))
 
@@ -57,21 +57,21 @@ class Palette(wx.Panel):
 		self.stat_bmp.Bind(wx.EVT_LEFT_UP, self.onClick)
 
 	def refresh(self):
-		for r in range(len(self.tile_matrix)):
-			for c in range(len(self.tile_matrix[r])):
-				self.DrawTile(r, c)
+		for x in range(len(self.tile_matrix[0])):
+			for y in range(len(self.tile_matrix[x])):
+				self.DrawTile(x, y)
 		self.DrawGrid(255,0,0)
 		self.render()
 		self.palSizer.Add(self.stat_bmp)
 
 
 	# draws a tile into the array at the specified row and column
-	def DrawTile(self, row, col):
-		t = self.tile_matrix[row][col]
+	def DrawTile(self, xpos, ypos):
+		t = self.tile_matrix[xpos][ypos]
 		tile_image = t.img.ShrinkBy(self.shrink_factor,self.shrink_factor)
 		for x in range(tile_image.GetWidth()):
 			for y in range(tile_image.GetHeight()):
-				self.img.SetRGB(x+col*self.shrunken_size, y+row*self.shrunken_size, tile_image.GetRed(x,y), tile_image.GetGreen(x,y), tile_image.GetBlue(x,y))
+				self.img.SetRGB(x+xpos*self.shrunken_size, y+ypos*self.shrunken_size, tile_image.GetRed(x,y), tile_image.GetGreen(x,y), tile_image.GetBlue(x,y))
 
 	def DrawGrid(self, r, g, b):
 		for yval in range(self.tile_size,self.height,self.tile_size):
@@ -91,9 +91,9 @@ class Palette(wx.Panel):
 
 	# given an absolute coordinate, returns tile matrix coordinate
 	def get_tile_coordinate(self, y_coord, x_coord):
-		r = y_coord // self.shrunken_size
-		c = x_coord // self.shrunken_size
-		return r, c
+		xpos = x_coord // self.shrunken_size
+		ypos = y_coord // self.shrunken_size
+		return xpos, ypos
 
 	def onClick(self, e):
 
@@ -101,11 +101,11 @@ class Palette(wx.Panel):
 		self.get_active().render()
 
 		x, y = e.GetPositionTuple()[0], e.GetPositionTuple()[1]
-		r, c = self.get_tile_coordinate(y, x)
+		xpos, ypos = self.get_tile_coordinate(y, x)
 
-		self.active_index = (r,c)
-		self.tile_matrix[r][c].active = True
-		self.tile_matrix[r][c].render()
+		self.active_index = (xpos,ypos)
+		self.tile_matrix[xpos][ypos].active = True
+		self.tile_matrix[xpos][ypos].render()
 
 		
 		self.refresh()

@@ -18,8 +18,6 @@ class Tile(object):
 
 		self.pixel_array = numpy.zeros((self.pixels_across, self.pixels_tall, 3),'uint8')
 		self.pixel_array[:,:] = bgcolor
-
-		#self.paint_pixel(3,3,100,100,100)
 		
 		self.img = self.render()
 
