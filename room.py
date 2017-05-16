@@ -42,6 +42,7 @@ class Room(object):
 	# draws a tile into the array at the specified x and y position
 	def DrawTile(self, xpos, ypos):
 		t = self.tile_matrix[xpos][ypos]
+		#print t.img.GetSize()
 		tile_image = t.img
 		for x in range(self.tile_size):
 			for y in range(self.tile_size):

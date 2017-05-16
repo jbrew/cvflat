@@ -3,6 +3,7 @@ import wx
 import numpy
 import json
 from room import Room
+from worldmap import Worldmap
 from displaywindow import DisplayWindow
 from tile import Tile
 from image import Image
@@ -48,24 +49,28 @@ class CVFlat(wx.Panel):
 		self.palette = Palette(self, height = 100, width = 100, tiles_across=2, tiles_tall=2, full_tile_size=100)
 
 
-
-		self.current_room = Room(self, self.palette, width=800, height=500)
-
+		self.worldmap = Worldmap(self, self.palette, 2, 2)
+		self.room_index = (0,0)
+		
+		self.current_room = self.worldmap.room_grid[self.room_index[0]][self.room_index[1]]
 		self.display_window = DisplayWindow(self, height=500, width=800, current_room=self.current_room)
 
 		#filepath = 'images/sonic.jpg'
 		filepath = 'images/smileface.png'
 		self.avatar = wx.Image(filepath, wx.BITMAP_TYPE_ANY)
-		#self.current_room.DrawImageAtPosition(self.avatar, 2, 2)
 		self.display_window.refresh()
-
-		#self.current_room.DrawImageAtPosition(self.get_screencap(2,2,200), 2, 4)
 
 		self.avatar_at_position(self.position[0], self.position[1])
 
 		self.Bind(wx.EVT_CHAR_HOOK, lambda event: self.onKey(event))
 
 		self.refresh()
+
+	def set_current_room(self, room_index):
+		self.current_room = self.worldmap.room_grid[self.room_index[0]][self.room_index[1]]
+		self.display_window.set_current_room(self.current_room)
+		self.display_window.refresh()
+		self.avatar_at_position(self.position[0], self.position[1])
 
 
 	def get_screencap(self, xpos, ypos, scope=100):
@@ -91,16 +96,13 @@ class CVFlat(wx.Panel):
 
 		if keycode == wx.WXK_LEFT:
 			new_x, new_y = self.position[0]-1, self.position[1]
-			self.TryMove(new_x, new_y)
 		elif keycode == wx.WXK_RIGHT:
 			new_x, new_y = self.position[0]+1, self.position[1]
-			self.TryMove(new_x, new_y)
 		elif keycode == wx.WXK_UP:
 			new_x, new_y = self.position[0], self.position[1]-1
-			self.TryMove(new_x, new_y)
 		elif keycode == wx.WXK_DOWN:
 			new_x, new_y = self.position[0], self.position[1]+1
-			self.TryMove(new_x, new_y)
+		self.TryMove(new_x, new_y)
 
 	def onClickMakeCV(self, event):
 		tile_matrix = self.current_room.tile_matrix
@@ -131,29 +133,45 @@ class CVFlat(wx.Panel):
 			for y in range(len(slide_matrix[0])):
 				if slide_matrix[x][y]:
 					s = slide_matrix[x][y]
+					print 'current_pos:', x, y
+					print 'north:', x, y-1
+					print 'south:', x, y+1
+					print 'west:', x-1, y
+					print 'east:', x+1, y
 					#print slide_matrix[x][y].slide_id
 					if y-1 in range(len(slide_matrix[0])) and slide_matrix[x][y-1]:
 						above = slide_matrix[x][y-1]
+
 						s.choices.append(('North',above.slide_id))
 					if y+1 in range(len(slide_matrix[0])) and slide_matrix[x][y+1]:
 						below = slide_matrix[x][y+1]
 						s.choices.append(('South',below.slide_id))
-					if x+1 in range(len(slide_matrix)) and slide_matrix[x+1][y]:
-						right = slide_matrix[x+1][y]
-						s.choices.append(('East',right.slide_id))
 					if x-1 in range(len(slide_matrix)) and slide_matrix[x-1][y]:
 						left = slide_matrix[x-1][y]
 						s.choices.append(('West',left.slide_id))
+					if x+1 in range(len(slide_matrix)) and slide_matrix[x+1][y]:
+						right = slide_matrix[x+1][y]
+						s.choices.append(('East',right.slide_id))
 					
 					
-
-
 
 	def TryMove(self, new_x, new_y):
+		print new_x, new_y, self.current_room.tiles_across
 		if self.current_room.SquareIsEmpty(new_x, new_y):
-				self.current_room.DrawTile(self.position[0],self.position[1])
-				self.position = (new_x, new_y)
-				self.avatar_at_position(self.position[0], self.position[1])
+			self.current_room.DrawTile(self.position[0],self.position[1])
+			self.position = (new_x, new_y)
+			self.avatar_at_position(self.position[0], self.position[1])
+		elif new_x == self.current_room.tiles_across and self.room_index[0] < self.worldmap.rooms_across-1:
+			self.current_room.DrawTile(self.position[0],self.position[1])
+			self.room_index = (self.room_index[0] + 1, self.room_index[1])
+			self.position = (0, new_y)
+			self.set_current_room(self.room_index)
+			
+		elif new_x == -1 and self.room_index[0] > 0:
+			self.current_room.DrawTile(self.position[0],self.position[1])
+			self.room_index = (self.room_index[0] - 1, self.room_index[1])
+			self.position = (self.current_room.tiles_across-1, new_y)
+			self.set_current_room(self.room_index)
 		else:
 			print "Can't make that move"
 

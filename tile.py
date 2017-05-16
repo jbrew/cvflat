@@ -3,7 +3,7 @@ import wx
 import numpy
 
 class Tile(object):
-	def __init__(self, parent, height, width, pixels_across, bgcolor=(0,0,0)):
+	def __init__(self, parent, height, width, pixels_across, bgcolor=(0,0,0), texture=None):
 		self.parent = parent
 
 		self.height = height
@@ -21,27 +21,30 @@ class Tile(object):
 		self.pixel_array = numpy.zeros((self.pixels_across, self.pixels_tall, 3),'uint8')
 		self.pixel_array[:,:] = bgcolor
 		
-		
 		self.img = self.render()
-		#self.stone()
+
+		if texture:
+			self.texture(texture)
 
 
-	def stone(self):
-		filepath = 'textures/stone.png'
-		stone = wx.Image(filepath, wx.BITMAP_TYPE_ANY)
-		img_width, img_height = stone.GetSize()
-		print img_width, img_height
-		if img_width > self.width and img_height > self.height:
-			stone = stone.ShrinkBy(img_width/self.width, img_height/self.height)
-			self.img = stone
-			print stone.GetSize()
-
-		#stone_tile.img = stone
+	def texture(self, texturepath):
+		filepath = texturepath
+		img = wx.Image(filepath, wx.BITMAP_TYPE_ANY)
+		W = img.GetWidth()
+		H = img.GetHeight()
+		if W > H:
+			NewW = self.height
+			NewH = self.height * H / W
+		else:
+			NewH = self.height
+			NewW = self.height * W / H
+		img = img.Scale(NewW,NewH)
+		self.img = img
 
 	def render(self):
 		array = self.pixel_array_to_array(self.pixel_array)
-		self.img = self.ArrayToImage(array)
-		return self.img
+		img = self.ArrayToImage(array)
+		return img
 
 	def pixel_array_to_array(self, pixel_array):
 		array = numpy.zeros((int(self.height), int(self.width), 3),'uint8')
