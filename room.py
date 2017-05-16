@@ -4,29 +4,25 @@ import wx
 from tile import Tile
 
 
-class Room(wx.Panel):
+class Room(object):
 
 	# takes width and height in squares
 	def __init__(self, parent, palette, width, height):
-		wx.Panel.__init__(self, parent)
-		self.height = height
-		self.width = width
+		self.active = True
+
 		self.tiles_across = 8
-
-		self.tile_size = int(self.width / self.tiles_across)
-		self.tiles_tall = int(self.height / self.tile_size)
-
-		self.wmSizer = wx.BoxSizer(wx.VERTICAL)
+		self.tiles_tall = 5
+		self.tile_size = 100
+		self.height = self.tiles_tall * self.tile_size
+		self.width = self.tiles_across * self.tile_size
 
 		self.palette = palette
 
-		self.tile_matrix = [[Tile(self, self.tile_size, self.tile_size, 10, bgcolor=(0,0,100)) for y in range(self.tiles_tall)] for x in range(self.tiles_across)]
+		self.tile_matrix = [[Tile(parent, self.tile_size, self.tile_size, 10, bgcolor=(0,0,100)) for y in range(self.tiles_tall)] for x in range(self.tiles_across)]
 		
 		self.img = self.ArrayToImage(numpy.zeros( (self.height, self.width, 3),'uint8'))
 		
-		self.TileMatrixToImage()
-
-		self.refresh()
+		self.DrawTileMatrix()
 
 # tile placement
 #############################
@@ -47,36 +43,14 @@ class Room(wx.Panel):
 	def DrawTile(self, xpos, ypos):
 		t = self.tile_matrix[xpos][ypos]
 		tile_image = t.img
-		for x in range(tile_image.GetWidth()):
-			for y in range(tile_image.GetHeight()):
+		for x in range(self.tile_size):
+			for y in range(self.tile_size):
 				self.img.SetRGB(x+xpos*self.tile_size, y+ypos*self.tile_size, tile_image.GetRed(x,y), tile_image.GetGreen(x,y), tile_image.GetBlue(x,y))
 
-	def TileMatrixToImage(self):
+	def DrawTileMatrix(self):
 		for x in range(self.tiles_across):
 			for y in range(self.tiles_tall):
 				self.DrawTile(x, y)
-
-
-	def render(self):
-		self.bmp = self.img.ConvertToBitmap()
-		self.stat_bmp = wx.StaticBitmap(self, -1, self.bmp, (10, 5), (self.img.GetWidth(), self.img.GetHeight()))
-		self.stat_bmp.Bind(wx.EVT_LEFT_UP, self.onClick)
-		self.wmSizer.Clear()
-		self.wmSizer.Add(self.stat_bmp)
-
-# wx window communication methods
-####################################################
-
-	def refresh(self):
-		#self.DrawLattice(255,0,0)
-		self.render()
-
-	def onClick(self, e):
-		x, y = e.GetPositionTuple()[0], e.GetPositionTuple()[1]
-		xpos, ypos = self.get_tile_coordinate(x, y)
-		self.PlaceTile(xpos, ypos, self.palette.get_active())
-		self.DrawTile(xpos,ypos)
-		self.refresh()
 
 # draw methods
 ##############################################

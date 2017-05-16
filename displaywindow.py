@@ -23,6 +23,7 @@ class DisplayWindow(wx.Panel):
 ####################################################
 
 	def refresh(self):
+		self.img = self.current_room.img
 		self.bmp = self.img.ConvertToBitmap()
 		self.stat_bmp = wx.StaticBitmap(self, -1, self.bmp, (10, 5), (self.img.GetWidth(), self.img.GetHeight()))
 		self.stat_bmp.Bind(wx.EVT_LEFT_UP, self.onClick)
@@ -32,7 +33,7 @@ class DisplayWindow(wx.Panel):
 	def onClick(self, e):
 		x, y = e.GetPositionTuple()[0], e.GetPositionTuple()[1]
 		xpos, ypos = self.current_room.get_tile_coordinate(x, y)
-		self.current_room.PlaceTile(xpos, ypos, self.palette.get_active())
+		self.current_room.PlaceTile(xpos, ypos, self.current_room.palette.get_active())
 		self.current_room.DrawTile(xpos,ypos)
 		self.refresh()
 

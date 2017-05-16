@@ -3,6 +3,7 @@ import wx
 import numpy
 import json
 from room import Room
+from displaywindow import DisplayWindow
 from tile import Tile
 from image import Image
 from palette import Palette
@@ -45,13 +46,18 @@ class CVFlat(wx.Panel):
 		self.slides = []
 
 		self.palette = Palette(self, height = 100, width = 100, tiles_across=2, tiles_tall=2, full_tile_size=100)
+
+
+
 		self.current_room = Room(self, self.palette, width=800, height=500)
+
+		self.display_window = DisplayWindow(self, height=500, width=800, current_room=self.current_room)
 
 		#filepath = 'images/sonic.jpg'
 		filepath = 'images/smileface.png'
 		self.avatar = wx.Image(filepath, wx.BITMAP_TYPE_ANY)
 		#self.current_room.DrawImageAtPosition(self.avatar, 2, 2)
-		self.current_room.refresh()
+		self.display_window.refresh()
 
 		#self.current_room.DrawImageAtPosition(self.get_screencap(2,2,200), 2, 4)
 
@@ -70,12 +76,12 @@ class CVFlat(wx.Panel):
 
 		self.hSizer.Add(self.palette)
 		self.hSizer.AddSpacer(50)
-		self.hSizer.Add(self.current_room)
+		self.hSizer.Add(self.display_window)
 		self.Layout()
 
 	def avatar_at_position(self, x, y):
 		self.current_room.DrawImageAtPosition(self.avatar, x, y)
-		self.current_room.refresh()
+		self.display_window.refresh()
 
 
 	def onKey(self, event):
@@ -125,19 +131,21 @@ class CVFlat(wx.Panel):
 			for y in range(len(slide_matrix[0])):
 				if slide_matrix[x][y]:
 					s = slide_matrix[x][y]
-					print slide_matrix[x][y].slide_id
-					if x-1 in range(len(slide_matrix)) and slide_matrix[x-1][y]:
-						left = slide_matrix[x-1][y]
-						s.choices.append(('Left',left.slide_id))
-					if x+1 in range(len(slide_matrix)) and slide_matrix[x+1][y]:
-						right = slide_matrix[x+1][y]
-						s.choices.append(('Right',right.slide_id))
+					#print slide_matrix[x][y].slide_id
 					if y-1 in range(len(slide_matrix[0])) and slide_matrix[x][y-1]:
 						above = slide_matrix[x][y-1]
-						s.choices.append(('Up',above.slide_id))
+						s.choices.append(('North',above.slide_id))
 					if y+1 in range(len(slide_matrix[0])) and slide_matrix[x][y+1]:
 						below = slide_matrix[x][y+1]
-						s.choices.append(('Down',below.slide_id))
+						s.choices.append(('South',below.slide_id))
+					if x+1 in range(len(slide_matrix)) and slide_matrix[x+1][y]:
+						right = slide_matrix[x+1][y]
+						s.choices.append(('East',right.slide_id))
+					if x-1 in range(len(slide_matrix)) and slide_matrix[x-1][y]:
+						left = slide_matrix[x-1][y]
+						s.choices.append(('West',left.slide_id))
+					
+					
 
 
 

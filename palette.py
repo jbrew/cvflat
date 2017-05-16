@@ -26,6 +26,7 @@ class Palette(wx.Panel):
 		self.img = self.ArrayToImage(numpy.zeros( (self.width, self.height,  3),'uint8'))
 
 		blue_tile = Tile(self, self.tile_size, self.tile_size, 10, bgcolor = (0,100,250))
+		
 		green_tile = Tile(self, self.tile_size, self.tile_size, 10, bgcolor = (0,255,210))
 		orange_tile = Tile(self, self.tile_size, self.tile_size, 10, bgcolor = (255,100,0))
 		black_tile = Tile(self, self.tile_size, self.tile_size, 10, bgcolor = (0,0,0))

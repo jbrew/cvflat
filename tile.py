@@ -11,6 +11,8 @@ class Tile(object):
 		self.pixels_across = pixels_across
 		self.pixels_tall = self.pixels_across
 
+		self.walls = {'West': False, 'East': False, 'North': False, 'South': False}
+
 		self.pixel_size = int(self.width/self.pixels_across)
 
 		self.emptiness = True
@@ -19,11 +21,22 @@ class Tile(object):
 		self.pixel_array = numpy.zeros((self.pixels_across, self.pixels_tall, 3),'uint8')
 		self.pixel_array[:,:] = bgcolor
 		
+		
 		self.img = self.render()
+		#self.stone()
 
-		self.stat_bmp = self.get_static_bmp(1)
 
+	def stone(self):
+		filepath = 'textures/stone.png'
+		stone = wx.Image(filepath, wx.BITMAP_TYPE_ANY)
+		img_width, img_height = stone.GetSize()
+		print img_width, img_height
+		if img_width > self.width and img_height > self.height:
+			stone = stone.ShrinkBy(img_width/self.width, img_height/self.height)
+			self.img = stone
+			print stone.GetSize()
 
+		#stone_tile.img = stone
 
 	def render(self):
 		array = self.pixel_array_to_array(self.pixel_array)
@@ -45,11 +58,6 @@ class Tile(object):
 					for y in range(y_min, y_max):
 						array[x,y] = color
 		return array
-
-	def get_static_bmp(self, shrink_factor):
-		scaled_img = self.img.ShrinkBy(shrink_factor, shrink_factor)
-		bmp = scaled_img.ConvertToBitmap()
-		return wx.StaticBitmap(self.parent, -1, bmp, (10, 5), (scaled_img.GetWidth(), scaled_img.GetHeight()))
 
 	def ArrayToImage(self, array):
 		height, width = len(array), len(array[0])

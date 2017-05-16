@@ -9,3 +9,7 @@ import wx
 class WorldMap(object):
 	def __init__(self, parent, palette, width, height):
 		self.room_grid = [[Room(self, parent, palette, width=800, height=500) for y in range(height)] for x in range(width)]
+
+
+	def get_room(self, x, y):
+		return self.room_grid[x][y]
