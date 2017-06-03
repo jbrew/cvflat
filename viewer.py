@@ -11,6 +11,8 @@ class Viewer(object):
 		self.frame.Show()
 		self.panel = wx.Panel(self.frame)
 		self.PhotoMaxSize = 240
+		self.mainSizer = wx.BoxSizer(wx.VERTICAL)
+
 		self.createWidgets()
 		self.buttonBox = wx.Panel(self.panel)
 		self.buttonSizer = wx.BoxSizer(wx.VERTICAL)
@@ -20,20 +22,20 @@ class Viewer(object):
 	def loadslide(self, slide_id):
 		self.mainSizer.Clear()
 		self.buttonSizer.Clear(True)
-		current_slide = self.slides[slide_id]
+		self.current_slide = self.slides[slide_id]
+		self.textbox.SetValue(self.current_slide.text)
 
-		self.loadimage(current_slide.imagepath)
+		self.loadimage(self.current_slide.imagepath)
 		
 		self.mainSizer.Add(self.buttonBox)
 
-		print '\nChoices:'
-		for choice in current_slide.choices:
+		for choice in self.current_slide.choices:
+			print 'choice', choice
 			choice_text, target_id = choice[0], choice[1]
-			print choice_text
 			cbutton = wx.Button(self.buttonBox, label=choice_text)
 			cbutton.Bind(wx.EVT_LEFT_UP, lambda event, target_id = target_id: self.onChoice(event, target_id))
 			self.buttonSizer.Add(cbutton)
-		
+
 		self.buttonSizer.Layout()
 		self.buttonBox.Refresh()
 		self.buttonBox.Layout()
@@ -55,22 +57,29 @@ class Viewer(object):
 		self.mainSizer.Add(self.imageCtrl, 0, wx.ALL, 5)
 
 
-	def onChoice(self, event, target_id):
-		self.loadslide(target_id)
-
-
 	def createWidgets(self):
 		img = wx.EmptyImage(240,240)
 		self.imageCtrl = wx.StaticBitmap(self.panel, wx.ID_ANY, 
 										 wx.BitmapFromImage(img))
- 
-		self.mainSizer = wx.BoxSizer(wx.VERTICAL)
 		
 		self.mainSizer.Add(wx.StaticLine(self.panel, wx.ID_ANY),
 						   0, wx.ALL|wx.EXPAND, 5)
 		self.mainSizer.Add(self.imageCtrl, 0, wx.ALL, 5)
  
+ 		self.textbox = wx.TextCtrl(self.panel)
+ 		self.textbox.Bind(wx.EVT_TEXT, self.onText)
+ 		self.mainSizer.Add(self.textbox)
+
 		self.panel.SetSizer(self.mainSizer)
 		self.mainSizer.Fit(self.frame)
  
 		self.panel.Layout()
+
+	def onChoice(self, event, target_id):
+		self.loadslide(target_id)
+
+	def onText(self, e):
+		print self.textbox.GetValue()
+		self.current_slide.text = self.textbox.GetValue()
+
+

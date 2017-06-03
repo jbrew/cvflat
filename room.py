@@ -7,18 +7,18 @@ from tile import Tile
 class Room(object):
 
 	# takes width and height in squares
-	def __init__(self, parent, palette, width, height):
+	def __init__(self, parent, palette, width, height, tiles_across, tiles_tall):
 		self.active = True
 
-		self.tiles_across = 8
-		self.tiles_tall = 5
-		self.tile_size = 100
+		self.tiles_across = tiles_across
+		self.tiles_tall = tiles_tall
+		self.tile_size = 50
 		self.height = self.tiles_tall * self.tile_size
 		self.width = self.tiles_across * self.tile_size
 
 		self.palette = palette
 
-		self.tile_matrix = [[Tile(parent, self.tile_size, self.tile_size, 10, bgcolor=(0,0,100)) for y in range(self.tiles_tall)] for x in range(self.tiles_across)]
+		self.tile_matrix = [[Tile(parent, self.tile_size, self.tile_size, 10, bgcolor=(300,200,100)) for y in range(self.tiles_tall)] for x in range(self.tiles_across)]
 		
 		self.img = self.ArrayToImage(numpy.zeros( (self.height, self.width, 3),'uint8'))
 		
@@ -77,10 +77,15 @@ class Room(object):
 
 		tile = self.tile_matrix[xpos][ypos]
 		tile_width, tile_height = self.tile_size, self.tile_size
-		img_width, img_height = img.GetSize()
-
-		if img_width > tile_width and img_height > tile_height:
-			img = img.ShrinkBy(img_width/tile_width, img_height/tile_height)
+		W = img.GetWidth()
+		H = img.GetHeight()
+		if W > H:
+			NewW = self.tile_size
+			NewH = self.tile_size * H / W
+		else:
+			NewH = self.tile_size
+			NewW = self.tile_size * W / H
+		img = img.Scale(NewW,NewH)
 
 		img_width, img_height = img.GetSize()
 

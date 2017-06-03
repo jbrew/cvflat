@@ -1,6 +1,7 @@
 from __future__ import division
 import wx
 import numpy
+import math
 
 class Tile(object):
 	def __init__(self, parent, height, width, pixels_across, bgcolor=(0,0,0), texture=None):
@@ -16,6 +17,8 @@ class Tile(object):
 		self.pixel_size = int(self.width/self.pixels_across)
 
 		self.emptiness = True
+		self.npc = False
+
 		self.active = False
 
 		self.pixel_array = numpy.zeros((self.pixels_across, self.pixels_tall, 3),'uint8')
@@ -24,10 +27,21 @@ class Tile(object):
 		self.img = self.render()
 
 		if texture:
-			self.texture(texture)
+			self.make_texture(texture)
 
+	def toggle_west_wall(self):
+		self.walls['West'] = not self.walls['West']
 
-	def texture(self, texturepath):
+	def toggle_east_wall(self):
+		self.walls['East'] = not self.walls['East']
+
+	def toggle_north_wall(self):
+		self.walls['North'] = not self.walls['North']
+
+	def toggle_south_wall(self):
+		self.walls['South'] = not self.walls['South']
+
+	def make_texture(self, texturepath):
 		filepath = texturepath
 		img = wx.Image(filepath, wx.BITMAP_TYPE_ANY)
 		W = img.GetWidth()
@@ -87,6 +101,15 @@ class Tile(object):
 		for r in range(len(self.pixel_array)):
 			for c in range(len(self.pixel_array[r])):
 				self.pixel_array[r,c] = self.random_color()
+
+	def draw_circle(self, radius, r, g, b):
+		xcenter, ycenter = self.width/2, self.height/2
+		for x in range(self.width):
+			for y in range(self.height):
+				if abs(math.sqrt(math.pow((x - self.width/2),2) + math.pow((y - self.height/2),2))) < radius:
+					self.img.SetRGB(x, y, r, g, b)
+
+
 
 	def randomize_type(self):
 		x = numpy.random.uniform()

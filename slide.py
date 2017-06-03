@@ -8,10 +8,10 @@ import wx
 
 class Slide(object):
 
-	def __init__(self, slide_id, map_wximage, cvname):
+	def __init__(self, slide_id, image, cvname):
 		self.slide_id = slide_id
 		self.cvname = cvname
-		self.map_wximage = map_wximage
+		self.image = image
 		self.title = 'testtitle'
 		self.text = 'testtext'
 		self.choices = []
@@ -19,7 +19,6 @@ class Slide(object):
 		self.shareable = False
 		self.start = False
 		self.link_style = u'action'
-		self.links = self.choices
 		self.image_path = '%s_images/%s' % (self.cvname, self.slide_id)
 		self.save_to_file()
 
@@ -28,7 +27,7 @@ class Slide(object):
 		if not os.path.exists(image_dir):
 			os.makedirs(image_dir)
 		self.imagepath = '%s/%s' % (image_dir, self.slide_id)
-		self.map_wximage.SaveFile(self.imagepath, wx.BITMAP_TYPE_PNG)
+		self.image.SaveFile(self.imagepath, wx.BITMAP_TYPE_PNG)
 
 	def get_links(self):
 		return [{u'body': choice[0], 
@@ -38,7 +37,6 @@ class Slide(object):
 		u'order': None, 
 		u'to_node': choice[1], 
 		u'transition': u''} for choice in self.choices]
-
 
 	def to_json(self):
 		ordered = json.dumps(OrderedDict([(u'body', self.text),

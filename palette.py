@@ -27,15 +27,16 @@ class Palette(wx.Panel):
 
 		blue_tile = Tile(self, self.tile_size, self.tile_size, 10, bgcolor = (0,100,250))
 		
-		green_tile = Tile(self, self.tile_size, self.tile_size, 10, texture='textures/grass.jpg')
+		#green_tile = Tile(self, self.tile_size, self.tile_size, 10, texture='textures/grass.jpg')
 		orange_tile = Tile(self, self.tile_size, self.tile_size, 10, bgcolor = (255,100,0))
 		stone_tile = Tile(self, self.tile_size, self.tile_size, 10, texture='textures/stone.png')
+		dot_tile = Tile(self, self.tile_size, self.tile_size, 10, bgcolor = (50,50,50))
+		dot_tile.draw_circle(radius=4, r=100, g=100,b=250)
 
-		orange_tile.emptiness = False
 		stone_tile.emptiness = False
 
 		self.tile_matrix[0][0] = blue_tile
-		self.tile_matrix[0][1] = green_tile
+		self.tile_matrix[0][1] = dot_tile
 		self.tile_matrix[1][0] = orange_tile
 		self.tile_matrix[1][1] = stone_tile
 
