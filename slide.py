@@ -8,26 +8,24 @@ import wx
 
 class Slide(object):
 
-	def __init__(self, slide_id, image, cvname):
+	def __init__(self, slide_id, image, image_dir):
 		self.slide_id = slide_id
-		self.cvname = cvname
 		self.image = image
-		self.title = 'testtitle'
-		self.text = 'testtext'
+		self.image_dir = image_dir
+		self.title = ''
+		self.text = ''
 		self.choices = []
 		self.finish = False
 		self.shareable = False
 		self.start = False
 		self.link_style = u'action'
-		self.image_path = '%s_images/%s' % (self.cvname, self.slide_id)
 		self.save_to_file()
 
 	def save_to_file(self):
-		image_dir = self.cvname + '_images'
-		if not os.path.exists(image_dir):
-			os.makedirs(image_dir)
-		self.imagepath = '%s/%s' % (image_dir, self.slide_id)
-		self.image.SaveFile(self.imagepath, wx.BITMAP_TYPE_PNG)
+		if not os.path.exists(self.image_dir):
+			os.makedirs(self.image_dir)
+		self.image_path = '%s/%s' % (self.image_dir, self.slide_id)
+		self.image.SaveFile(self.image_path, wx.BITMAP_TYPE_PNG)
 
 	def get_links(self):
 		return [{u'body': choice[0], 

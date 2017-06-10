@@ -53,7 +53,16 @@ class Tile(object):
 			NewH = self.height
 			NewW = self.height * W / H
 		img = img.Scale(NewW,NewH)
-		self.img = img
+
+		img_width, img_height = img.GetSize()
+
+		for x in range(img_width):
+				for y in range(img_height):
+					r,g,b = img.GetRed(x,y), img.GetGreen(x,y), img.GetBlue(x,y)
+					if r+g+b > 0:
+						self.img.SetRGB(x, y, r,g,b)
+
+		#self.img = img
 
 	def render(self):
 		array = self.pixel_array_to_array(self.pixel_array)
